@@ -16,6 +16,7 @@ Usage:
 	update-alternatives --remove NAME PATH
 	update-alternatives --set NAME PATH
 	update-alternatives --display NAME
+	update-alternatives --config NAME
 	update-alternatives -h|--help
 
 Commands:
@@ -44,6 +45,11 @@ Commands:
 			is the master link. Information displayed includes 
 			which alternative the symlink currently points to and
 			other alternatives that are available.
+
+	--config NAME
+			Show available alternatives for a link group and allow
+			the user to select which one to use. The link group is
+			then updated with the selection.
 
 	-h|--help	Show this help message
 `)

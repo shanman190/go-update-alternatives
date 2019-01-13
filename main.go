@@ -15,6 +15,7 @@ var options struct {
 	Remove bool `long:"remove"`
 	Set bool `long:"set"`
 	Display bool `long:"display"`
+	Config bool `long:"config"`
 	Help bool `short:"h" long:"help"`
 }
 
@@ -41,6 +42,8 @@ func main() {
 		command = &commands.DisplayCommand{}
 	} else if options.Help {
 		command = &commands.HelpCommand{}
+	} else if options.Config {
+		command = &commands.ConfigCommand{}
 	} else {
 		fmt.Fprintf(ui.Stderr, "Unknown command: %s\n", os.Args[1:])
 		os.Exit(1)

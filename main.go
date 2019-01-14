@@ -3,20 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
-	
+
 	"github.com/jessevdk/go-flags"
-	
+
 	"github.com/shanman190/update-alternatives/commands"
 	"github.com/shanman190/update-alternatives/ui"
 )
 
 var options struct {
 	Install bool `long:"install"`
-	Remove bool `long:"remove"`
-	Set bool `long:"set"`
+	Remove  bool `long:"remove"`
+	Set     bool `long:"set"`
 	Display bool `long:"display"`
-	Config bool `long:"config"`
-	Help bool `short:"h" long:"help"`
+	Config  bool `long:"config"`
+	Help    bool `short:"h" long:"help"`
 }
 
 type Command interface {

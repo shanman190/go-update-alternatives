@@ -35,7 +35,7 @@ func (command *DisplayCommand) Execute(args []string) error {
 
 	currentLink, err := symbolic.Readlink(alternativePath)
 	if err != nil {
-		fmt.Fprintf(ui.Stderr, "Error: unable to read symbolic link %s", err)
+		fmt.Fprintf(ui.Stderr, "Error: unable to read symbolic link %s\n", err)
 		os.Exit(1)
 	}
 

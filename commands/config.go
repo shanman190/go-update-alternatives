@@ -40,7 +40,7 @@ func (command *ConfigCommand) Execute(args []string) error {
 	alternativePath := filepath.Join(config.GetAlternativesDir(), group)
 	currentLink, err := symbolic.Readlink(alternativePath)
 	if err != nil {
-		fmt.Fprintf(ui.Stderr, "Error: unable to read symbolic link %s", err)
+		fmt.Fprintf(ui.Stderr, "Error: unable to read symbolic link %s\n", err)
 		os.Exit(1)
 	}
 	
@@ -61,6 +61,7 @@ func (command *ConfigCommand) Execute(args []string) error {
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
 	text = strings.Replace(text, "\n", "", -1)
+	text = strings.Replace(text, "\r", "", -1)
 
 	if text != "" {
 		choice, err := strconv.Atoi(text)
@@ -71,7 +72,7 @@ func (command *ConfigCommand) Execute(args []string) error {
 
 		err = symbolic.Ln(alternatives.Alternatives[choice], alternativePath)
 		if err != nil {
-			fmt.Fprintf(ui.Stderr, "could not create symbolic link '%s' from choice '%s'", alternativePath, alternatives.Alternatives[choice])
+			fmt.Fprintf(ui.Stderr, "could not create symbolic link '%s' from choice '%s'\n", alternativePath, alternatives.Alternatives[choice])
 			os.Exit(1)
 		}
 	}

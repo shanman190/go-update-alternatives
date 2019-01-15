@@ -43,7 +43,7 @@ func (command *ConfigCommand) Execute(args []string) error {
 		fmt.Fprintf(ui.Stderr, "Error: unable to read symbolic link %s\n", err)
 		os.Exit(1)
 	}
-	
+
 	fmt.Printf("There are %d choices for the alternative %s.\nSelection\tPath\n", alternativesLen, group)
 	fmt.Printf("%s\n", strings.Repeat("-", 80))
 
@@ -67,6 +67,11 @@ func (command *ConfigCommand) Execute(args []string) error {
 		choice, err := strconv.Atoi(text)
 		if err != nil {
 			fmt.Fprintf(ui.Stderr, "Unable to get selection: %s\n", err)
+			os.Exit(1)
+		}
+
+		if choice >= alternativesLen {
+			fmt.Fprintf(ui.Stderr, "Invalid selection: %s\n", err)
 			os.Exit(1)
 		}
 

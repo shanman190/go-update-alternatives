@@ -23,17 +23,14 @@ func (command *InstallCommand) Execute(args []string) error {
 	path := filepath.Clean(args[2])
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		fmt.Fprintf(ui.Stderr, "update-alternatives: error: alternative path %s doesn't exist\n", path)
-		os.Exit(1)
+		return fmt.Errorf("alternative path %s doesn't exist", path)
 	} else if err != nil {
-		fmt.Fprintln(ui.Stderr, "update-alternatives: error: unknown error encountered")
-		os.Exit(1)
+		return fmt.Errorf("unknown error encountered: %s", err)
 	}
 
 	alternativesDir := config.GetAlternativesDir()
 	if err := os.MkdirAll(alternativesDir, os.ModePerm); err != nil {
-		fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to create alternatives directory '%s'\n", alternativesDir)
-		os.Exit(1)
+		return fmt.Errorf("unable to create alternatives directory '%s'", alternativesDir)
 	}
 
 	alternativePath := filepath.Join(alternativesDir, group)
@@ -45,12 +42,10 @@ func (command *InstallCommand) Execute(args []string) error {
 	config.SaveAlternative(link, group, path)
 
 	if err := symbolic.Ln(path, alternativePath); err != nil {
-		fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to install '%s' to '%s': %s\n", path, alternativePath, err)
-		os.Exit(1)
+		return fmt.Errorf("unable to install '%s' to '%s': %s", path, alternativePath, err)
 	}
 	if err := symbolic.Ln(alternativePath, link); err != nil {
-		fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to install '%s' to '%s': %s\n", alternativePath, link, err)
-		os.Exit(1)
+		return fmt.Errorf("unable to install '%s' to '%s': %s", alternativePath, link, err)
 	}
 	
 	return nil

@@ -28,7 +28,7 @@ func main() {
 
 	remainingArgs, err := parser.Parse()
 	if err != nil {
-		handleError(err)
+		handleError(fmt.Errorf("unable to parse arguments: %s", err))
 	}
 
 	var command Command
@@ -45,17 +45,15 @@ func main() {
 	} else if options.Config {
 		command = &commands.ConfigCommand{}
 	} else {
-		fmt.Fprintf(ui.Stderr, "Unknown command: %s\n", os.Args[1:])
-		os.Exit(1)
+		handleError(fmt.Errorf("unknown command: %s\n", os.Args[1:]))
 	}
 
-	command.Execute(remainingArgs)
+	handleError(command.Execute(remainingArgs))
 }
 
 func handleError(err error) {
 	if err != nil {
-		fmt.Fprintf(ui.Stderr, "error: %s\n", err)
-
+		fmt.Fprintf(ui.Stderr, "update-alternatives: error: %s\n", err)
 		os.Exit(1)
 	}
 }

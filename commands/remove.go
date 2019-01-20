@@ -26,6 +26,12 @@ func (command *RemoveCommand) Execute(args []string) error {
 		fmt.Fprintf(ui.Stderr, "Error: unable to create directory '%s'\n", alternativesDir)
 		os.Exit(1)
 	}
+	var link string
+	if alternatives, err := config.LoadAlternatives(group); err == nil {
+		link = alternatives.Link
+	} else if err != nil {
+		fmt.Fprintf(ui.Stderr, "Error: unable to load alternatives\n")
+	}
 	config.DeleteAlternative(group, path)
 	alternativePath := filepath.Join(alternativesDir, group)
 
@@ -40,6 +46,15 @@ func (command *RemoveCommand) Execute(args []string) error {
 		if err != nil {
 			fmt.Fprintf(ui.Stderr, "Error: Unable to remove symbolic link from %s\n\n%s\n", alternativePath, err)
 			os.Exit(1)
+		}
+	}
+
+	if alternatives, err := config.LoadAlternatives(group); err == nil {
+		if len(alternatives.Alternatives) == 0 {
+			if err := symbolic.Unlink(link); err != nil {
+				fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to remove symbolic link at '%s': %s\n", link, err)
+				os.Exit(1)
+			}
 		}
 	}
 

@@ -11,17 +11,29 @@ import (
 )
 
 type configuration struct {
+	Link string
 	Alternatives []string
 }
 
 func SaveAlternative(
+	link string,
 	groupName string,
 	path string,
 ) error {
 	groupConfigFile := filepath.Join(GetAdminDir(), groupName)
 
-	alternatives, err := LoadAlternatives(groupName)
-	if err != nil {
+	var alternatives *configuration
+	if _, err := os.Stat(groupConfigFile); err == nil {
+		alternatives, err = LoadAlternatives(groupName)
+		if err != nil {
+			return err
+		}
+	} else if os.IsNotExist(err) {
+		alternatives = &configuration{
+			Link: link,
+			Alternatives: []string{},
+		}
+	} else {
 		return err
 	}
 

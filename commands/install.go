@@ -42,7 +42,7 @@ func (command *InstallCommand) Execute(args []string) error {
 		fmt.Printf("update-alternatives: using %s to provide %s (%s)\n", path, link, group)
 	}
 
-	config.SaveAlternative(group, path)
+	config.SaveAlternative(link, group, path)
 
 	if err := symbolic.Ln(path, alternativePath); err != nil {
 		fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to install '%s' to '%s': %s\n", path, alternativePath, err)

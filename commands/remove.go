@@ -23,37 +23,36 @@ func (command *RemoveCommand) Execute(args []string) error {
 
 	alternativesDir := config.GetAlternativesDir()
 	if err := os.MkdirAll(alternativesDir, os.ModePerm); err != nil {
-		fmt.Fprintf(ui.Stderr, "Error: unable to create directory '%s'\n", alternativesDir)
-		os.Exit(1)
+		return fmt.Errorf("unable to create alternatives directory '%s'", alternativesDir)
 	}
 	var link string
 	if alternatives, err := config.LoadAlternatives(group); err == nil {
+		if len(alternatives.Alternatives) == 0 {
+			return nil
+		}
 		link = alternatives.Link
 	} else if err != nil {
-		fmt.Fprintf(ui.Stderr, "Error: unable to load alternatives\n")
+		return fmt.Errorf("unable to open '%s': %s", filepath.Join(alternativesDir, group), err)
 	}
+
 	config.DeleteAlternative(group, path)
+	
 	alternativePath := filepath.Join(alternativesDir, group)
-
-	linkPath, err := symbolic.Readlink(alternativePath)
-	if err != nil {
-		fmt.Fprintf(ui.Stderr, "Error: Unable to resolve symlink %s\n\n%s\n", alternativePath, err)
-		os.Exit(1)
-	}
-
-	if linkPath == path {
-		err = symbolic.Unlink(alternativePath)
-		if err != nil {
-			fmt.Fprintf(ui.Stderr, "Error: Unable to remove symbolic link from %s\n\n%s\n", alternativePath, err)
-			os.Exit(1)
-		}
-	}
-
+	linkPath, linkErr := symbolic.Readlink(alternativePath)
 	if alternatives, err := config.LoadAlternatives(group); err == nil {
 		if len(alternatives.Alternatives) == 0 {
 			if err := symbolic.Unlink(link); err != nil {
-				fmt.Fprintf(ui.Stderr, "update-alternatives: error: unable to remove symbolic link at '%s': %s\n", link, err)
-				os.Exit(1)
+				return fmt.Errorf("unable to remove symbolic link at '%s': %s", link, err)
+			}
+		} else {
+			if linkPath == path {
+				if err := symbolic.Unlink(alternativePath); err != nil {
+					return fmt.Errorf("unable to remove symbolic link at '%s': %s", alternativePath, err)
+				}
+			}
+
+			if linkErr != nil {
+				fmt.Fprintf(ui.Stderr, "update-alternatives: warning: forcing reinstallation of alternative (%s) because link group %s is broken\n", "null", group)
 			}
 		}
 	}

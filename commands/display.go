@@ -40,10 +40,10 @@ func (command *DisplayCommand) Execute(args []string) error {
 	}
 
 	for index, alternative := range alternatives.Alternatives {
-		if currentLink == alternative {
-			fmt.Printf("* %d  %s\n", index, alternative)
+		if currentLink == alternative.Path {
+			fmt.Printf("* %d  %s\n", index, alternative.Path)
 		} else {
-			fmt.Printf("  %d  %s\n", index, alternative)
+			fmt.Printf("  %d  %s\n", index, alternative.Path)
 		}
 	}
 

@@ -33,7 +33,7 @@ func (command *ConfigCommand) Execute(args []string) error {
 
 	alternativesLen := len(alternatives.Alternatives)
 	if alternativesLen == 1 {
-		fmt.Printf("There is only one alternative in link group %s.\n: %s\nNothing to configure.\n", group, alternatives.Alternatives[0])
+		fmt.Printf("There is only one alternative in link group %s.\n: %s\nNothing to configure.\n", group, alternatives.Alternatives[0].Path)
 		return nil
 	}
 
@@ -48,10 +48,10 @@ func (command *ConfigCommand) Execute(args []string) error {
 	fmt.Printf("%s\n", strings.Repeat("-", 80))
 
 	for index, alternative := range alternatives.Alternatives {
-		if currentLink == alternative {
-			fmt.Printf("* %d\t\t%s\n", index, alternative)
+		if currentLink == alternative.Path {
+			fmt.Printf("* %d\t\t%s\n", index, alternative.Path)
 		} else {
-			fmt.Printf("  %d\t\t%s\n", index, alternative)
+			fmt.Printf("  %d\t\t%s\n", index, alternative.Path)
 		}
 	}
 
@@ -75,9 +75,9 @@ func (command *ConfigCommand) Execute(args []string) error {
 			os.Exit(1)
 		}
 
-		err = symbolic.Ln(alternatives.Alternatives[choice], alternativePath)
+		err = symbolic.Ln(alternatives.Alternatives[choice].Path, alternativePath)
 		if err != nil {
-			fmt.Fprintf(ui.Stderr, "could not create symbolic link '%s' from choice '%s'\n", alternativePath, alternatives.Alternatives[choice])
+			fmt.Fprintf(ui.Stderr, "could not create symbolic link '%s' from choice '%s'\n", alternativePath, alternatives.Alternatives[choice].Path)
 			os.Exit(1)
 		}
 	}

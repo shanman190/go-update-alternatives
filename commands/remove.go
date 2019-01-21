@@ -49,6 +49,21 @@ func (command *RemoveCommand) Execute(args []string) error {
 				if err := symbolic.Unlink(alternativePath); err != nil {
 					return fmt.Errorf("unable to remove symbolic link at '%s': %s", alternativePath, err)
 				}
+
+				indexHigh := 0
+				priorityHigh := alternatives.Alternatives[0].Priority
+				for index, alternative := range alternatives.Alternatives[1:] {
+					if priorityHigh < alternative.Priority {
+						indexHigh = index
+						priorityHigh = alternative.Priority
+					}
+				}
+
+				if err := symbolic.Ln(alternatives.Alternatives[indexHigh].Path, alternativePath); err == nil {
+					fmt.Printf("update-alternatives: using %s to provide %s (%s)\n", alternatives.Alternatives[indexHigh].Path, link, group)
+				} else {
+					return fmt.Errorf("unable to install '%s' to '%s': %s", alternatives.Alternatives[indexHigh].Path, link, err)
+				}
 			}
 
 			if linkErr != nil {

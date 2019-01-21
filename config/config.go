@@ -10,15 +10,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Alternative struct {
+	Path string
+	Priority int64
+}
+
 type configuration struct {
 	Link string
-	Alternatives []string
+	Alternatives []Alternative
 }
 
 func SaveAlternative(
 	link string,
 	groupName string,
 	path string,
+	priority int64,
 ) error {
 	groupConfigFile := filepath.Join(GetAdminDir(), groupName)
 
@@ -31,7 +37,7 @@ func SaveAlternative(
 	} else if os.IsNotExist(err) {
 		alternatives = &configuration{
 			Link: link,
-			Alternatives: []string{},
+			Alternatives: []Alternative{},
 		}
 	} else {
 		return err
@@ -39,13 +45,26 @@ func SaveAlternative(
 
 	found := false
 	for _, alternative := range alternatives.Alternatives {
-		if alternative == path {
+		if alternative.Path == path {
 			found = true
 		}
 	}
 
 	if !found {
-		alternatives.Alternatives = append(alternatives.Alternatives, path)
+		newIndex := 0
+		for index, alternative := range alternatives.Alternatives {
+			if priority < alternative.Priority {
+				break
+			}
+			newIndex = index + 1
+		}
+		if newIndex < len(alternatives.Alternatives) {
+			alternatives.Alternatives = append(alternatives.Alternatives, Alternative{})
+			copy(alternatives.Alternatives[(newIndex + 1):], alternatives.Alternatives[newIndex:])
+			alternatives.Alternatives[newIndex] = Alternative{path, priority}	
+		} else {
+			alternatives.Alternatives = append(alternatives.Alternatives, Alternative{path, priority})
+		}
 		
 		return writeAlternatives(groupConfigFile, alternatives)
 	}
@@ -69,7 +88,7 @@ func LoadAlternatives(groupName string) (*configuration, error) {
 	
 	if alternatives == nil {
 		return &configuration{
-			Alternatives: []string{},
+			Alternatives: []Alternative{},
 		}, nil
 	}
 
@@ -87,9 +106,9 @@ func DeleteAlternative(
 		return err
 	}
 
-	results := []string{}
+	results := []Alternative{}
 	for _, alternative := range alternatives.Alternatives {
-		if alternative != path {
+		if alternative.Path != path {
 			results = append(results, alternative)
 		}
 	}

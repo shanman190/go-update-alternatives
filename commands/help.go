@@ -52,6 +52,13 @@ Commands:
 			then updated with the selection.
 
 	-h|--help	Show this help message
+
+Examples:
+	update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-11.0.6/bin/java 0
+	update-alternatives --remove java /usr/lib/jvm/jdk-11.0.6/bin/java
+	update-alternatives --set java /usr/lib/jvm/jdk-11.0.6/bin/java
+	update-alternatives --display java
+	update-alternatives --config java
 `)
 
 	return nil

@@ -6,3 +6,5 @@ require (
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 )
+
+go 1.13
